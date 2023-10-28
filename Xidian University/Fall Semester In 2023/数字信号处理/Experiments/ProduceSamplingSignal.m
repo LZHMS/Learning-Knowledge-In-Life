@@ -1,29 +1,29 @@
-function [N, xn] = ProduceSamplingSignal(f1, f2, f3, f4, fs)
-% ProduceSamplingSignal Function:
-%    Function Description: 
-%            We want to make a digital signal composed of four frequency
-%            components and sample the produced signal.
-%    Inputs: f1, f2, f3, f4 means our selected frequency components, fs
+function xn = ProduceSamplingSignal(f1, f2, f3, fs, Np)
+% Function Description: 
+%        We want to make a digital signal composed of three frequency
+%        components and sample the produced signal.
+% Inputs: 
+%        f1, f2, f3: means our selected frequency components, fs
 %            represents the sampling frequency.
-%    Outputs:
-%            N: represents the number of sampling points
-%            xn: represents the sampled signal
+%        Np: means the number of periods.
+% Outputs:
+%        xn: represents the sampled signal.
 
-    ts = 1/fs;            % sampling timestep
-    t = 0: ts : 0.5;        % samping sequence of discrete sampling points
-    t0 = 0: 0.0001: 0.5;    % analog time sequence
-    N = 1 / ts;           % samping points
-    % Produce digital signal
-    xt = cos(2*pi*f1*t0 - pi/6) + 2.0 * cos(4*pi*f2*t0 + pi/3) + ...
-         0.4*cos(6*pi*f3*t0 - pi*2/3) + 0.5*cos(8*pi*f4*t0 + pi/3);
-    % Sample produced signal
-    xn = cos(2*pi*f1*t - pi/6) + 2.0 * cos(4*pi*f2*t + pi/3) + ...
-        0.4*cos(6*pi*f3*t - pi*2/3) + 0.5*cos(8*pi*f4*t + pi/3);
+    period = 1/f1;        % the period of analog signal(assuming f1 is the minimal)
+    T = Np*period;         % sampling time-domain window(several periods)
+    Ts = 1 / fs;          % sampling timestep
+    t0 = 0: Ts : T;       % samping sequence of discrete sampling points
+    t = 0: 0.0001: T;     % analog time sequence
 
-    % Visualize produced signal and sampled signal
+    % Step I: Produce digital signal
+    xt = cos(2*pi*f1*t) + cos(2*pi*f2*t) + cos(2*pi*f3*t);
+    % Step II: Sample produced signal
+    xn = cos(2*pi*f1*t0) + cos(2*pi*f2*t0) + cos(2*pi*f3*t0);
+
+    % Step III: Visualize produced signal and sampled signal
     figure;
     subplot(2, 1, 1);
-    plot(t0, xt);
+    plot(t, xt);
     txt = title('Time-domain signal $x(t)$');
     set(txt, 'Interpreter', 'latex');
     txt = xlabel('$t/s$');
@@ -31,8 +31,9 @@ function [N, xn] = ProduceSamplingSignal(f1, f2, f3, f4, fs)
     txt = ylabel('Amplitude');
     set(txt, 'Interpreter', 'latex');
     grid on
+
     subplot(2, 1, 2);
-    stem(t, xn);
+    stem(t0, xn);
     txt = title('Time-domain sampled signal $x(n)$');
     set(txt, 'Interpreter', 'latex');
     txt = ylabel('Amplitude');
